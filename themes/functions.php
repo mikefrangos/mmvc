@@ -9,9 +9,10 @@
 */
 function get_debug() {
   $mm = CMmvc::Instance();
-  $html = "<h2>Debuginformation</h2><hr><p>The content of the config array:</p><pre>" . htmlentities(print_r($mm->config, true)) . "</pre>";
-  $html .= "<hr><p>The content of the data array:</p><pre>" . htmlentities(print_r($mm->data, true)) . "</pre>";
-  $html .= "<hr><p>The content of the request array:</p><pre>" . htmlentities(print_r($mm->request, true)) . "</pre>";
+  $html = null;
+  if(isset($mm->config['debug']['display-mmvc'])) {
+    $html = "<hr><h3>Debuginformation</h3><p>The content of CMmvc:</p><pre>" . htmlent(print_r($mm, true)) . "</pre>";
+  }    
   return $html;
 }
 

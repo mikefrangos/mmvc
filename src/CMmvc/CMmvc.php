@@ -15,6 +15,14 @@ class CMmvc implements ISingleton {
     // include the site specific config.php and create a ref to $ly to be used by config.php
     $mm = &$this;
     require(MMVC_SITE_PATH.'/config.php');
+    
+    // Start a named session
+                session_name($this->config['session_name']);
+                session_start();
+                
+                // Set default date/time-zone
+                date_default_timezone_set($this->config['timezone']);
+    
   }
   
   
@@ -57,9 +65,10 @@ class CMmvc implements ISingleton {
     if($controllerExists && $controllerEnabled && $classExists) {
       $rc = new ReflectionClass($className);
       if($rc->implementsInterface('IController')) {
-        if($rc->hasMethod($method)) {
+      	  $formattedMethod = str_replace(array('_', '-'), '', $method);
+        if($rc->hasMethod($formattedMethod)) {
           $controllerObj = $rc->newInstance();
-          $methodObj = $rc->getMethod($method);
+          $methodObj = $rc->getMethod($formattedMethod);
           $methodObj->invokeArgs($controllerObj, $arguments);
         } else {
           die("404. " . get_class() . ' error: Controller does not contain method.');
