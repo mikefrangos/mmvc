@@ -7,28 +7,42 @@
 class CMmvc implements ISingleton {
 
   private static $instance = null;
+  public $config = array();
+  public $request;
+  public $data;
+  public $db;
+  public $views;
+  public $session;
+  public $timer = array();
+  
+  
 
   /**
    * Constructor
    */
   protected function __construct() {
+    $this->timer['first'] = microtime(true); 
+  	  
     // include the site specific config.php and create a ref to $ly to be used by config.php
     $mm = &$this;
     require(MMVC_SITE_PATH.'/config.php');
     
     // Start a named session
-                session_name($this->config['session_name']);
-                session_start();
+      session_name($this->config['session_name']);
+      session_start();
+      $this->session = new CSession($this->config['session_key']);
+      $this->session->PopulateFromSession();            
                 
-                // Set default date/time-zone
-                date_default_timezone_set($this->config['timezone']);
+    // Set default date/time-zone
+      date_default_timezone_set($this->config['timezone']);
     
-                 if(isset($this->config['database'][0]['dsn'])) {
-        $this->db = new CMDatabase($this->config['database'][0]['dsn']);
-     }
+     // Create a database object.
+       if(isset($this->config['database'][0]['dsn'])) {
+         $this->db = new CMDatabase($this->config['database'][0]['dsn']);
+       }
      
-        // Create a container for all views and theme data
-          $this->views = new CViewContainer();
+     // Create a container for all views and theme data
+       $this->views = new CViewContainer();
   }
   
   
@@ -94,6 +108,13 @@ class CMmvc implements ISingleton {
    * Theme Engine Render, renders the views using the selected theme.
    */
   public function ThemeEngineRender() {
+    $this->session->StoreInSession();
+    
+    if(!isset($this->config['theme'])) {
+      return;
+    }
+    
+  	  
     // Get the paths and settings for the theme
     $themeName    = $this->config['theme']['name'];
     $themePath    = MMVC_INSTALL_PATH . "/themes/{$themeName}";

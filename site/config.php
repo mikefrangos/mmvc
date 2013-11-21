@@ -20,6 +20,8 @@ $mm->config['database'][0]['dsn'] = 'sqlite:' . MMVC_SITE_PATH . '/data/.ht.sqli
  * Set what to show as debug or developer information in the get_debug() theme helper.
  */
 $mm->config['debug']['mmvc'] = true;
+$mm->config['debug']['session'] = true;
+$mm->config['debug']['timer'] = true;
 $mm->config['debug']['db-num-queries'] = true;
 $mm->config['debug']['db-queries'] = true;
 
@@ -28,6 +30,7 @@ $mm->config['debug']['db-queries'] = true;
 * Define session name
 */
 $mm->config['session_name'] = preg_replace('/[:\.\/-_]/', '', $_SERVER["SERVER_NAME"]);
+$mm->config['session_key']  = 'mmvc';
 
 /*
 * Define server timezone
