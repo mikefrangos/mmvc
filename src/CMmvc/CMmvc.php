@@ -23,6 +23,9 @@ class CMmvc implements ISingleton {
                 // Set default date/time-zone
                 date_default_timezone_set($this->config['timezone']);
     
+                 if(isset($this->config['database'][0]['dsn'])) {
+        $this->db = new CMDatabase($this->config['database'][0]['dsn']);
+     }
   }
   
   

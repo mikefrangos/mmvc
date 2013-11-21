@@ -10,7 +10,13 @@
 function get_debug() {
   $mm = CMmvc::Instance();
   $html = null;
-  if(isset($mm->config['debug']['display-mmvc'])) {
+  if(isset($mm->config['debug']['db-num-queries']) && $mm->config['debug']['db-num-queries'] && isset($mm->db)) {
+    $html .= "<p>Database made " . $mm->db->GetNumQueries() . " queries.</p>";
+  }    
+  if(isset($mm->config['debug']['db-queries']) && $mm->config['debug']['db-queries'] && isset($mm->db)) {
+    $html .= "<p>Database made the following queries.</p><pre>" . implode('<br/><br/>', $mm->db->GetQueries()) . "</pre>";
+  }   
+  if(isset($mm->config['debug']['mmvc']) && $mm->config['debug']['mmvc']) {
     $html = "<hr><h3>Debuginformation</h3><p>The content of CMmvc:</p><pre>" . htmlent(print_r($mm, true)) . "</pre>";
   }    
   return $html;
