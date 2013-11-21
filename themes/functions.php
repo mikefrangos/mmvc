@@ -35,3 +35,10 @@ function base_url($url) {
 function current_url() {
   return CMmvc::Instance()->request->current_url;
 }
+
+/**
+* Render all views.
+*/
+function render_views() {
+  return CMmvc::Instance()->views->Render();
+}
