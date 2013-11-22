@@ -7,6 +7,7 @@
     <textarea name='newEntry'></textarea></label>
   </p>
   <p>
+    <input style="display:none" type='text' name='email' value='' />
     <input type='submit' name='doAdd' value='Add message' />
     <input type='submit' name='doClear' value='Clear all messages' />
     <input type='submit' name='doCreate' value='Create database table' />

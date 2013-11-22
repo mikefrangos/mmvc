@@ -19,8 +19,8 @@ $mm->config['database'][0]['dsn'] = 'sqlite:' . MMVC_SITE_PATH . '/data/.ht.sqli
 /**
  * Set what to show as debug or developer information in the get_debug() theme helper.
  */
-$mm->config['debug']['mmvc'] = true;
-$mm->config['debug']['session'] = true;
+$mm->config['debug']['mmvc'] = false;
+$mm->config['debug']['session'] = false;
 $mm->config['debug']['timer'] = true;
 $mm->config['debug']['db-num-queries'] = true;
 $mm->config['debug']['db-queries'] = true;

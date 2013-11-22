@@ -34,13 +34,13 @@ class CCGuestbook extends CObject implements IController {
    * Handle posts from the form and take appropriate action.
    */
   public function Handler() {
-    if(isset($_POST['doAdd'])) {
+    if(empty($_POST['email']) && isset($_POST['doAdd'])) {
       $this->guestbookModel->Add(strip_tags($_POST['newEntry']));
     }
-    elseif(isset($_POST['doClear'])) {
+    elseif(empty($_POST['email']) && isset($_POST['doClear'])) {
       $this->guestbookModel->DeleteAll();
     }            
-    elseif(isset($_POST['doCreate'])) {
+    elseif(empty($_POST['email']) && isset($_POST['doCreate'])) {
       $this->guestbookModel->Init();
     }            
      $this->RedirectTo($this->request->CreateUrl($this->request->controller));
