@@ -56,12 +56,40 @@ function get_messages_from_session() {
   return $html;
 }
 
+/**
+* Login menu. Creates a menu which reflects if user is logged in or not.
+*/
+function login_menu() {
+  $mm = CMmvc::Instance();
+  if($mm->user['isAuthenticated']) {
+    $items = "<a href='" . create_url('user/profile') . "'><img class='gravatar' src='" . get_gravatar(20) . "' alt=''> " . $mm->user['acronym'] . "</a> ";
+    if($mm->user['hasRoleAdmin']) {
+      $items .= "<a href='" . create_url('acp') . "'>acp</a> ";
+    }
+    $items .= "<a href='" . create_url('user/logout') . "'>logout</a> ";
+  } else {
+    $items = "<a href='" . create_url('user/login') . "'>login</a> ";
+  }
+  return "<nav>$items</nav>";
+}
+
 
 /**
 * Create a url by prepending the base_url.
 */
 function base_url($url) {
   return CMmvc::Instance()->request->base_url . trim($url, '/');
+}
+
+/**
+ * Create a url to an internal resource.
+ *
+ * @param string the whole url or the controller. Leave empty for current controller.
+ * @param string the method when specifying controller as first argument, else leave empty.
+ * @param string the extra arguments to the method, leave empty if not using method.
+ */
+function create_url($urlOrController=null, $method=null, $arguments=null) {
+  return CMmvc::Instance()->request->CreateUrl($urlOrController, $method, $arguments);
 }
 
 /**
@@ -76,4 +104,11 @@ function current_url() {
 */
 function render_views() {
   return CMmvc::Instance()->views->Render();
+}
+
+/**
+* Get a gravatar based on the user's email.
+*/
+function get_gravatar($size=null) {
+  return 'http://www.gravatar.com/avatar/' . md5(strtolower(trim(CMmvc::Instance()->user['email']))) . '.jpg?' . ($size ? "s=$size" : null);
 }

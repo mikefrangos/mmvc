@@ -8,6 +8,9 @@
 <body>
   <div id="header">
     <?=$header?>
+    <div id='login-menu'>
+         <?=login_menu()?>
+    </div>
   </div>
   <div id="main" role="main">
     <?=get_messages_from_session()?>
