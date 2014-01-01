@@ -32,7 +32,10 @@ class CCUser extends CObject implements IController {
    */
   public function Profile() {
     $form = new CFormUserProfile($this, $this->user);
-    $form->Check();
+    if($form->Check() === false) {
+      $this->AddMessage('notice', 'Some fields did not validate and the form could not be processed.');
+      $this->RedirectToController('profile');
+    }
     
     $this->views->SetTitle('User Profile');
     $this->views->AddInclude(__DIR__ . '/profile.tpl.php', array(
@@ -49,7 +52,7 @@ class CCUser extends CObject implements IController {
   public function Login($akronymOrEmail=null, $password=null) {
      $form = new CFormUserLogin($this);
      if($form->Check() === false) {
-      $this->AddMessage('notice', 'Some fields did not validate and the form could not be processed.');
+      $this->AddMessage('notice', 'You must fill in acronym and password.');
       $this->RedirectToController('login');
     }
 

@@ -34,7 +34,7 @@ class CObject {
 /**
          * Redirect to another url and store the session
          */
-        protected function RedirectTo($urlOrController=null, $method=null) {
+        protected function RedirectTo($urlOrController=null, $method=null, $arguments=null) {
     $mm = CMmvc::Instance();
     if(isset($this->config['debug']['db-num-queries']) && $this->config['debug']['db-num-queries'] && isset($this->db)) {
       $this->session->SetFlash('database_numQueries', $this->db->GetNumQueries());
@@ -46,7 +46,7 @@ class CObject {
             $this->session->SetFlash('timer', $this->timer);
     }    
     $this->session->StoreInSession();
-    header('Location: ' . $this->request->CreateUrl($urlOrController, $method));
+    header('Location: ' . $this->request->CreateUrl($urlOrController, $method, $arguments));
   }
 
 /**
@@ -54,8 +54,8 @@ class CObject {
          *
          * @param string method name the method, default is index method.
          */
-        protected function RedirectToController($method=null) {
-    $this->RedirectTo($this->request->controller, $method);
+        protected function RedirectToController($method=null, $arguments=null) {
+    $this->RedirectTo($this->request->controller, $method, $arguments);
   }
 
 
@@ -65,10 +65,10 @@ class CObject {
          * @param string controller name the controller or null for current controller.
          * @param string method name the method, default is current method.
          */
-        protected function RedirectToControllerMethod($controller=null, $method=null) {
+        protected function RedirectToControllerMethod($controller=null, $method=null, $arguments=null) {
           $controller = is_null($controller) ? $this->request->controller : null;
           $method = is_null($method) ? $this->request->method : null;          
-    $this->RedirectTo($this->request->CreateUrl($controller, $method));
+    $this->RedirectTo($this->request->CreateUrl($controller, $method, $arguments));
   }
 
   /**
@@ -76,8 +76,15 @@ class CObject {
     *
     * @param $type string the type of message, for example: notice, info, success, warning, error.
     * @param $message string the message.
+    * @param $alternative string the message if the $type is set to false, defaults to null.
     */
    protected function AddMessage($type, $message) {
+     if($type === false) {
+      $type = 'error';
+      $message = $alternative;
+    } else if($type === true) {
+      $type = 'success';
+    }
      $this->session->AddMessage($type, $message);
    }
  

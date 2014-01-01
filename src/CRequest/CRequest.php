@@ -28,7 +28,7 @@ class CRequest {
                 }
     
     // Get current controller if empty and method choosen
-    if(empty($url) && (!empty($method)) || (!empty($arguments))) {
+    if(empty($url) && (!empty($method) || !empty($arguments))) {
       $url = $this->controller;
     }
     
@@ -61,25 +61,25 @@ class CRequest {
     $requestUri = $_SERVER['REQUEST_URI'];
     $scriptPart = $scriptName = $_SERVER['SCRIPT_NAME'];    
 
-    // Check if url is in format controller/method/arg1/arg2/arg3
-    if(substr_compare($requestUri, $scriptName, 0, strlen($scriptName))) {
-      $scriptPart = dirname($scriptName);
+    // Compare REQUEST_URI and SCRIPT_NAME as long they match, leave the rest as current request.
+    $i=0;
+    $len = min(strlen($requestUri), strlen($scriptName));
+    while($i<$len && $requestUri[$i] == $scriptName[$i]) {
+      $i++;
     }
-    
-    // Set query to be everything after base_url, except the optional querystring
-    
-    $query = trim(substr($requestUri, strlen(rtrim($scriptPart, '/'))), '/');    
-    
-    $pos = strcspn($query, '?');
-    if($pos) {
-      $query = substr($query, 0, $pos);    
+    $request = trim(substr($requestUri, $i), '/');
+  
+     // Remove the ?-part from the query when analysing controller/metod/arg1/arg2
+    $queryPos = strpos($request, '?');
+    if($queryPos !== false) {
+      $request = substr($request, 0, $queryPos);
     }
     
     // Check if this looks like a querystring approach link
-    if(substr($query, 0, 1) === '?' && isset($_GET['q'])) {
-      $query = trim($_GET['q']);
+    if(empty($request) && isset($_GET['q'])) {
+      $request = trim($_GET['q']);
     }
-    $splits = explode('/', $query);
+    $splits = explode('/', $request);
 
     // Set controller, method and arguments
     $controller =  !empty($splits[0]) ? $splits[0] : 'index';
@@ -97,7 +97,8 @@ class CRequest {
       $this->current_url  = $currentUrl;
     $this->request_uri  = $requestUri;
     $this->script_name  = $scriptName;
-    $this->query         = $query;
+    $this->request = $request;
+ //   $this->query         = $query;
     $this->splits         = $splits;
     $this->controller     = $controller;
     $this->method         = $method;
