@@ -66,6 +66,7 @@ $mm->config['controllers'] = array(
   'page'    => array('enabled' => true,'class' => 'CCPage'),
   'user' => array('enabled' => true,'class' => 'CCUser'),
   'acp'       => array('enabled' => true,'class' => 'CCAdminControlPanel'),
+  'theme' => array('enabled' => true,'class' => 'CCTheme'),
 );
 
 /**
@@ -73,7 +74,23 @@ $mm->config['controllers'] = array(
 */
 $mm->config['theme'] = array(
   // The name of the theme in the theme directory
-  'name'    => 'core', 
+  'name'    => 'grid', 
+  'stylesheet'  => 'style.php', 
+  'template_file'   => 'index.tpl.php',
+  'regions' => array('flash','featured-first','featured-middle','featured-last',
+    'primary','sidebar','column-first','column-middle','column-last',
+    'footer-column-one','footer-column-two','footer-column-three','footer-column-four',
+    'footer',
+  ),
+  'data' => array(
+    'header' => 'Mmvc',
+    'slogan' => 'A PHP-based MVC-inspired CMF',
+ /*   'favicon' => 'logo_80x80.png',
+    'logo' => 'logo_80x80.png',  
+    'logo_width'  => 80,
+    'logo_height' => 80,  */
+    'footer' => '<p>Mmvc &copy; by Mike Frangos </p>',
+  ),
 );
 
 /**
