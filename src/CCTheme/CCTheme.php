@@ -25,7 +25,7 @@ class CCTheme extends CObject implements IController {
         $methods = $rc->getMethods(ReflectionMethod::IS_PUBLIC);
         foreach($methods as $method) {
           if($method->name != '__construct' && $method->name != '__destruct' && $method->name != 'Index') {
-            $items[] = $this->request->controller . mb_strtolower($method->name);
+            $items[] = $this->request->controller . '/' . mb_strtolower($method->name);
           }
         }
   	  
