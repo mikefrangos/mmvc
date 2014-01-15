@@ -31,7 +31,7 @@ class CViewContainer {
     * @param $value string to be set as title.
     */
    public function SetTitle($value) {
-     $this->SetVariable('title', $value);
+     return $this->SetVariable('title', $value);
   }
 
 
@@ -42,6 +42,7 @@ class CViewContainer {
     */
    public function SetVariable($key, $value) {
      $this->data[$key] = $value;
+     return $this;
   }
 
 
@@ -95,8 +96,8 @@ class CViewContainer {
     if(!isset($this->views[$region])) return;
     foreach($this->views[$region] as $view) {
       switch($view['type']) {
-        case 'include': extract($view['variables']); include($view['file']); break;
-        case 'string':  extract($view['variables']); echo $view['string']; break;
+        case 'include': if(isset($view['variables'])) extract($view['variables']); include($view['file']); break;
+        case 'string':  if(isset($view['variables'])) extract($view['variables']); echo $view['string']; break;
       }
     }
   }

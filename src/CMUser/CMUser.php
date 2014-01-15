@@ -4,7 +4,7 @@
 * 
 * @package MmvcCore
 */
-class CMUser extends CObject implements IHasSQL, ArrayAccess {
+class CMUser extends CObject implements IHasSQL, ArrayAccess, IModule {
 
 	
 	public $profile = array();
@@ -60,10 +60,14 @@ class CMUser extends CObject implements IHasSQL, ArrayAccess {
   }
 
 
-  /**
-   * Init the database and create appropriate tables.
-   */
-  public function Init() {
+ /**
+    * Implementing interface IModule. Manage install/update/deinstall and equal actions.
+    *
+    * @param string $action what to do.
+    */
+  public function Manage($action=null) {
+    switch($action) {
+      case 'install':
     try {
       $this->db->ExecuteQuery(self::SQL('drop table user2group'));
       $this->db->ExecuteQuery(self::SQL('drop table group'));
@@ -85,11 +89,18 @@ class CMUser extends CObject implements IHasSQL, ArrayAccess {
       $this->db->ExecuteQuery(self::SQL('insert into user2group'), array($idRootUser, $idAdminGroup));
       $this->db->ExecuteQuery(self::SQL('insert into user2group'), array($idRootUser, $idUserGroup));
       $this->db->ExecuteQuery(self::SQL('insert into user2group'), array($idDoeUser, $idUserGroup));
-      $this->AddMessage('success', 'Successfully created the database tables and created a default admin user as root:root and an ordinary user as doe:doe.');
+      return array('success', 'Successfully created the database tables and created a default admin user as root:root and an ordinary user as doe:doe.');
     } catch(Exception$e) {
       die("$e<br/>Failed to open database: " . $this->config['database'][0]['dsn']);
     }
+    break;
+    
+     default:
+         throw new Exception('Unsupported action for this module.');
+     break;
+    
   }
+ }
   
 
   /**

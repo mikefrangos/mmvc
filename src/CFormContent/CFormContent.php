@@ -2,7 +2,7 @@
 /**
 * A form to manage content.
 * 
-* @package LydiaCore
+* @package MmvcCore
 */
 class CFormContent extends CForm {
 
@@ -24,7 +24,8 @@ class CFormContent extends CForm {
          ->AddElement(new CFormElementTextarea('data', array('label'=>'Content:', 'value'=>$content['data'])))
          ->AddElement(new CFormElementText('type', array('value'=>$content['type'])))
          ->AddElement(new CFormElementText('filter', array('value'=>$content['filter'])))
-         ->AddElement(new CFormElementSubmit($save, array('callback'=>array($this, 'DoSave'), 'callback-args'=>array($content))));
+         ->AddElement(new CFormElementSubmit($save, array('callback'=>array($this, 'DoSave'), 'callback-args'=>array($content))))
+         ->AddElement(new CFormElementSubmit('delete', array('callback'=>array($this, 'DoDelete'), 'callback-args'=>array($content))));
 
     $this->SetValidation('title', array('not_empty'))
          ->SetValidation('key', array('not_empty'));
@@ -44,5 +45,13 @@ class CFormContent extends CForm {
     return $content->Save();
   }
   
+  /**
+   * Callback to delete the content.
+   */
+  public function DoDelete($form, $content) {
+    $content['id'] = $form['id']['value'];
+    $content->Delete();
+    CMmvc::Instance()->RedirectTo('content');
+  }
   
 }

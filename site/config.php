@@ -67,6 +67,37 @@ $mm->config['controllers'] = array(
   'user' => array('enabled' => true,'class' => 'CCUser'),
   'acp'       => array('enabled' => true,'class' => 'CCAdminControlPanel'),
   'theme' => array('enabled' => true,'class' => 'CCTheme'),
+  'module'   => array('enabled' => true,'class' => 'CCModules'),
+  'my'        => array('enabled' => true,'class' => 'CCMycontroller'),
+);
+
+/**
+ * Define a routing table for urls.
+ *
+ * Route custom urls to a defined controller/method/arguments
+ */
+$mm->config['routing'] = array(
+  'home' => array('enabled' => true, 'url' => 'index/index'),
+);
+
+/**
+ * Define menus.
+ *
+ * Create hardcoded menus and map them to a theme region through $mm->config['theme'].
+ */
+$mm->config['menus'] = array(
+  'navbar' => array(
+    'home'      => array('label'=>'Home', 'url'=>'home'),
+    'modules'   => array('label'=>'Modules', 'url'=>'module'),
+    'content'   => array('label'=>'Content', 'url'=>'content'),
+    'guestbook' => array('label'=>'Guestbook', 'url'=>'guestbook'),
+    'blog'      => array('label'=>'Blog', 'url'=>'blog'),
+  ),
+  'my-navbar' => array(
+    'home'      => array('label'=>'About Me', 'url'=>'my'),
+    'blog'      => array('label'=>'My Blog', 'url'=>'my/blog'),
+    'guestbook' => array('label'=>'Guestbook', 'url'=>'my/guestbook'),
+  ),
 );
 
 /**
@@ -74,14 +105,18 @@ $mm->config['controllers'] = array(
 */
 $mm->config['theme'] = array(
   // The name of the theme in the theme directory
-  'name'    => 'grid', 
-  'stylesheet'  => 'style.php', 
+  'path'            => 'site/themes/mytheme',
+ // 'path' => 'themes/grid',
+  'parent'          => 'themes/grid',
+ // 'name'    => 'grid', 
+  'stylesheet'  => 'style.css', 
   'template_file'   => 'index.tpl.php',
-  'regions' => array('flash','featured-first','featured-middle','featured-last',
+  'regions' => array('navbar','flash','featured-first','featured-middle','featured-last',
     'primary','sidebar','column-first','column-middle','column-last',
     'footer-column-one','footer-column-two','footer-column-three','footer-column-four',
     'footer',
   ),
+   'menu_to_region' => array('my-navbar'=>'navbar'),
   'data' => array(
     'header' => 'Mmvc',
     'slogan' => 'A PHP-based MVC-inspired CMF',

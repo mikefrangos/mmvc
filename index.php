@@ -5,7 +5,7 @@
 define('MMVC_INSTALL_PATH', dirname(__FILE__));
 define('MMVC_SITE_PATH', MMVC_INSTALL_PATH . '/site');
 
-require(MMVC_INSTALL_PATH.'/src/CMmvc/bootstrap.php');
+require(MMVC_INSTALL_PATH.'/src/bootstrap.php');
 
 $mm = CMmvc::Instance();
 

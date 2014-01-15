@@ -1,7 +1,7 @@
 <IfModule mod_rewrite.c>
   RewriteEngine on
   # Must use RewriteBase on www.student.bth.se, Rewritebase for url /~mos/test is /~mos/test/
-  RewriteBase /~mifb12/phpmvc/mmvc/tags/v0.2.20
+  RewriteBase /~mifb12/phpmvc/mmvc/tags/v0.2.24
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule (.*) index.php/$1 [NC,L]

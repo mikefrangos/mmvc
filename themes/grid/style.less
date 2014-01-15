@@ -133,7 +133,7 @@ body{margin:0;padding:0;color:@color;background-color:@bgcolor2;
 *
 */
 .tablecell() {display:table-cell;vertical-align:middle;text-align:center;}
-#outer-wrap-header{height:@magic-number*4;margin-top:@magic-number/2;margin-bottom:@magic-number/2;}
+#outer-wrap-header{padding-top:@magic-number/2;margin-bottom:@magic-number/2;}
 #inner-wrap-header{.wrap();}
 #header{.column(12);}
 
@@ -159,6 +159,19 @@ body{margin:0;padding:0;color:@color;background-color:@bgcolor2;
   #site-slogan{.tablecell();font-size:1.5em;padding-left:10px;}
 }
 
+/** --------------------------------------------------------------
+* Navbar
+*/
+#navbar{
+  ul.menu{list-style-type:none;padding:2px 8px;margin:0;
+    li{padding:0;margin:0;display:inline;
+      a{padding:6px 8px;text-decoration:none;border:2px solid transparent;
+        &:hover{background:#ddd;border:2px solid #999;}
+        &.selected{background:#ccc;border:2px solid #999;}
+      }
+    }
+  }
+}
 
 /** --------------------------------------------------------------
 * The flash area.
