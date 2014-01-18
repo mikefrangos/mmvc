@@ -93,7 +93,7 @@ $mm->config['menus'] = array(
     'guestbook' => array('label'=>'Guestbook', 'url'=>'guestbook'),
     'blog'      => array('label'=>'Blog', 'url'=>'blog'),
   ),
-  'my-navbar' => array(
+  'nav navbar-nav' => array(
     'home'      => array('label'=>'About Me', 'url'=>'my'),
     'blog'      => array('label'=>'My Blog', 'url'=>'my/blog'),
     'guestbook' => array('label'=>'Guestbook', 'url'=>'my/guestbook'),
@@ -105,9 +105,10 @@ $mm->config['menus'] = array(
 */
 $mm->config['theme'] = array(
   // The name of the theme in the theme directory
-  'path'            => 'site/themes/mytheme',
+//  'path'            => 'site/themes/mytheme',
  // 'path' => 'themes/grid',
-  'parent'          => 'themes/grid',
+  'path' => 'themes/dist',
+  'parent'          => 'themes/dist',
  // 'name'    => 'grid', 
   'stylesheet'  => 'style.css', 
   'template_file'   => 'index.tpl.php',
@@ -116,7 +117,7 @@ $mm->config['theme'] = array(
     'footer-column-one','footer-column-two','footer-column-three','footer-column-four',
     'footer',
   ),
-   'menu_to_region' => array('my-navbar'=>'navbar'),
+   'menu_to_region' => array('nav navbar-nav'=>'navbar'),
   'data' => array(
     'header' => 'Mmvc',
     'slogan' => 'A PHP-based MVC-inspired CMF',
