@@ -7,7 +7,7 @@
 class CMModules extends CObject {
 
   private $mmvcCoreModules = array('CMmvc', 'CDatabase', 'CRequest', 'CViewContainer', 'CSession', 'CObject');
-  private $mmvcCMFModules = array('CMmvc', 'CCPage', 'CCBlog', 'CMUser', 'CCUser', 'CMContent', 'CCContent', 'CFormUserLogin', 'CFormUserProfile', 'CFormUserCreate', 'CFormContent', 'CHTMLPurifier');
+  private $mmvcCMFModules = array('CMmvc', 'CMConfig', 'CCPage', 'CCBlog', 'CMUser', 'CCUser', 'CMContent', 'CCContent', 'CFormUserLogin', 'CFormUserProfile', 'CFormUserCreate', 'CFormContent', 'CTextFilter');
  
  
 	

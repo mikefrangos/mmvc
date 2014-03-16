@@ -44,16 +44,28 @@ class CMContent extends CObject implements IHasSQL, ArrayAccess, IModule {
   public static function SQL($key=null, $args=null) {
     $order_order  = isset($args['order-order']) ? $args['order-order'] : 'ASC';
     $order_by     = isset($args['order-by'])    ? $args['order-by'] : 'id';    
+    $groups = "";
+    if (isset($args['groups'])) {
+      foreach ($args['groups'] as $id) {
+    	    $groups .= "OR cg.idGroups={$id} ";
+       }
+    } 
     $queries = array(
       'drop table content'      => "DROP TABLE IF EXISTS Content;",
-      'create table content'    => "CREATE TABLE IF NOT EXISTS Content (id INTEGER PRIMARY KEY, key TEXT KEY, type TEXT, title TEXT, data TEXT, filter TEXT, idUser INT, created DATETIME default (datetime('now')), updated DATETIME default NULL, deleted DATETIME default NULL, FOREIGN KEY(idUser) REFERENCES User(id));",
+      'drop table content2group' => "DROP TABLE IF EXISTS Content2Groups",
+      'create table content'    => "CREATE TABLE IF NOT EXISTS Content (id INTEGER PRIMARY KEY, key TEXT KEY, type TEXT, title TEXT, data TEXT, filter TEXT, idUser INT, public INT default NULL, created DATETIME default (datetime('now')), updated DATETIME default NULL, deleted DATETIME default NULL, FOREIGN KEY(idUser) REFERENCES User(id));",
+      'create table content2group' => "CREATE TABLE IF NOT EXISTS Content2Groups (idContent INTEGER, idGroups INTEGER, created DATETIME default (datetime('now')), PRIMARY KEY(idContent, idGroups));", 
       'insert content'          => 'INSERT INTO Content (key,type,title,data,filter,idUser) VALUES (?,?,?,?,?,?);',
-      'select * by id'          => 'SELECT c.*, u.acronym as owner FROM Content AS c INNER JOIN User as u ON c.idUser=u.id WHERE c.id=? AND deleted IS NULL;',
-      'select * by type'        => "SELECT c.*, u.acronym as owner FROM Content AS c INNER JOIN User as u ON c.idUser=u.id WHERE type=? AND deleted IS NULL ORDER BY {$order_by} {$order_order};",
-      'select * by key'         => 'SELECT c.*, u.acronym as owner FROM Content AS c INNER JOIN User as u ON c.idUser=u.id WHERE c.key=? AND deleted IS NULL;',
-      'select *'                => 'SELECT c.*, u.acronym as owner FROM Content AS c INNER JOIN User as u ON c.idUser=u.id WHERE deleted IS NULL;;',
-      'update content'          => "UPDATE Content SET key=?, type=?, title=?, data=?, filter=?, updated=datetime('now') WHERE id=?;",
+      'insert into content2group'  => 'INSERT INTO Content2Groups (idContent,idGroups) VALUES (?,?);',
+      'get group memberships'   => 'SELECT * FROM Groups AS g INNER JOIN Content2Groups AS cg ON g.id=cg.idGroups WHERE cg.idContent=? AND g.deleted IS NULL;',
+      'select * by id'          => "SELECT c.*, u.acronym as owner FROM Content AS c INNER JOIN User as u ON c.idUser=u.id LEFT JOIN Content2Groups as cg ON c.id=cg.idContent WHERE (c.public IS NULL {$groups}) AND c.id=? AND c.deleted IS NULL;",
+      'select * by type'        => "SELECT c.*, u.acronym as owner FROM Content AS c INNER JOIN User as u ON c.idUser=u.id LEFT JOIN Content2Groups as cg ON c.id=cg.idContent WHERE (c.public IS NULL {$groups}) AND type=? AND c.deleted IS NULL ORDER BY {$order_by} {$order_order};",
+      'select * by key'         => 'SELECT c.*, u.acronym as owner FROM Content AS c INNER JOIN User as u ON c.idUser=u.id WHERE c.key=? AND c.deleted IS NULL;',
+      'select * by group'       => "SELECT c.*, u.acronym as owner FROM Content AS c INNER JOIN User as u ON c.idUser=u.id LEFT JOIN Content2Groups as cg ON c.id=cg.idContent WHERE (c.public IS NULL {$groups}) AND c.deleted IS NULL;",
+      'select *'                => 'SELECT c.*, u.acronym as owner FROM Content AS c INNER JOIN User as u ON c.idUser=u.id WHERE c.deleted IS NULL;;',
+      'update content'          => "UPDATE Content SET key=?, type=?, title=?, data=?, filter=?, public=?, updated=datetime('now') WHERE id=?;",
       'update content as deleted' => "UPDATE Content SET deleted=datetime('now') WHERE id=?;",
+      'remove from content2group'  => 'DELETE FROM Content2Groups WHERE (idContent=? AND idGroups=?);',
       );
     if(!isset($queries[$key])) {
       throw new Exception("No such SQL query, key '$key' was not found.");
@@ -68,8 +80,10 @@ class CMContent extends CObject implements IHasSQL, ArrayAccess, IModule {
     switch($action) {
       case 'install':
     try {
+      $this->db->ExecuteQuery(self::SQL('drop table content2group'));
       $this->db->ExecuteQuery(self::SQL('drop table content'));
-      $this->db->ExecuteQuery(self::SQL('create table content'));
+      $this->db->ExecuteQuery(self::SQL('create table content')); 
+      $this->db->ExecuteQuery(self::SQL('create table content2group')); 
       $this->db->ExecuteQuery(self::SQL('insert content'), array('hello-world', 'post', 'Hello World', "This is a demo post.\n\nThis is another row in this demo post.", 'plain', $this->user['id']));
       $this->db->ExecuteQuery(self::SQL('insert content'), array('hello-world-again', 'post', 'Hello World Again', "This is another demo post.\n\nThis is another row in this demo post.", 'plain', $this->user['id']));
       $this->db->ExecuteQuery(self::SQL('insert content'), array('hello-world-once-more', 'post', 'Hello World Once More', "This is one more demo post.\n\nThis is another row in this demo post.", 'plain', $this->user['id']));
@@ -80,6 +94,9 @@ class CMContent extends CObject implements IHasSQL, ArrayAccess, IModule {
       $this->db->ExecuteQuery(self::SQL('insert content'), array('htmlpurify', 'page', 'Page with HTMLPurifier', "This is a demo page with some HTML code intended to run through <a href='http://htmlpurifier.org/'>HTMLPurify</a>. Edit the source and insert HTML code and see if it works.\n\n<b>Text in bold</b> and <i>text in italic</i> and <a href='http://dbwebb.se'>a link to dbwebb.se</a>. JavaScript, like this: <javascript>alert('hej');</javascript> should however be removed.", 'htmlpurify', $this->user['id'])); 
       $this->db->ExecuteQuery(self::SQL('insert content'), array('markdown', 'page', 'Page with Markdown', "This is a demo page with some code intended to run through Markdown. Edit the source and insert Markdown and see if it works.\n\nHere is a paragraph with some **bold** text and some *italic* text and a [link to dbwebb.se](http://dbwebb.se).", 'markdown', $this->user['id']));
       $this->db->ExecuteQuery(self::SQL('insert content'), array('smartypants', 'page', 'Page with PHP Smartypants Typographer', "This is a demo page with some text intended to run through PHP SmartyPants Typographer. Edit the source and insert some text and see if it works.\n\nThis is \"double quotation marks\".\n\nThese are 'single quotation marks'.\n\nThis is a -- n dash.\n\nThis should be an ellipse...", 'smartypants', $this->user['id']));
+   /*   for ($i = 1; $i<=10; $i++) {
+      	    $this->db->ExecuteQuery(self::SQL('insert into content2group'), array($i, 3));
+      }   */
       return array('success', 'Successfully created the database tables and created a default "Hello World" blog post, owned by you.');
     } catch(Exception$e) {
       die("$e<br/>Failed to open database: " . $this->config['database'][0]['dsn']);
@@ -98,16 +115,22 @@ class CMContent extends CObject implements IHasSQL, ArrayAccess, IModule {
    *
    * @returns boolean true if success else false.
    */
-  public function Save() {
+  public function Save($add, $remove) {
     $msg = null;
     if($this['id']) {
-      $this->db->ExecuteQuery(self::SQL('update content'), array($this['key'], $this['type'], $this['title'], $this['data'], $this['filter'], $this['id']));
+      $this->db->ExecuteQuery(self::SQL('update content'), array($this['key'], $this['type'], $this['title'], $this['data'], $this['filter'], $this['public'], $this['id']));
       $msg = 'update';
     } else {
       $this->db->ExecuteQuery(self::SQL('insert content'), array($this['key'], $this['type'], $this['title'], $this['data'], $this['filter'], $this->user['id']));
       $this['id'] = $this->db->LastInsertId();
       $msg = 'created';
     }
+    foreach ($add as $id) {
+    	    $this->db->ExecuteQuery(self::SQL('insert into content2group'), array($this['id'], $id));
+    }
+    foreach ($remove as $id) {
+    	    $this->db->ExecuteQuery(self::SQL('remove from content2group'), array($this['id'], $id));
+    } 
     $rowcount = $this->db->RowCount();
     if($rowcount) {
       $this->AddMessage('success', "Successfully {$msg} content '{$this['key']}'.");
@@ -142,14 +165,23 @@ class CMContent extends CObject implements IHasSQL, ArrayAccess, IModule {
    * @returns boolean true if success else false.
    */
   public function LoadById($id) {
-    $res = $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('select * by id'), array($id));
-    if(empty($res)) {
-      $this->AddMessage('error', "Failed to load content with id '$id'.");
-      return false;
-    } else {
-      $this->data = $res[0];
-    }
-    return true;
+       $args=null;
+       if (isset($this->user['groups'])) {
+          $args['groups'] = Array();
+          foreach ($this->user['groups'] as $group) {
+    	      array_push($args['groups'],  $group['id']);
+          }
+       } 
+       $res = $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('select * by id', $args), array($id));
+       if(empty($res)) {
+         $this->AddMessage('error', "Failed to load content with id '$id'.");
+         return false;
+       } else {
+         $this->data = $res[0];
+         $this->data['groups'] = $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('get group memberships'), array($id)); 
+         return true;
+       }
+       return false;
   }
   
   
@@ -159,16 +191,22 @@ class CMContent extends CObject implements IHasSQL, ArrayAccess, IModule {
    * @returns array with listing or null if empty.
    */
   public function ListAll($args=null) {
+    if (isset($this->user['groups'])) {
+      $args['groups'] = Array();
+      foreach ($this->user['groups'] as $group) {
+    	      array_push($args['groups'],  $group['id']);
+      }
+    } 
     try {
       if(isset($args) && isset($args['type'])) {
         return $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('select * by type', $args), array($args['type']));	    
     } else {	    
-        return $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('select *', $args));
+        return $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('select * by group', $args));
       }
     } catch(Exception $e) {
       echo $e;
-      return null;
-    }
+      return null; 
+    }  
   }
   
   

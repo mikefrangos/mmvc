@@ -42,16 +42,24 @@ class CMUser extends CObject implements IHasSQL, ArrayAccess, IModule {
       'drop table user'    => "DROP TABLE IF EXISTS User;",
       'drop table group'        => "DROP TABLE IF EXISTS Groups;",
       'drop table user2group'   => "DROP TABLE IF EXISTS User2Groups;",
-      'create table user'  => "CREATE TABLE IF NOT EXISTS User (id INTEGER PRIMARY KEY, acronym TEXT KEY, name TEXT, email TEXT, algorithm TEXT, salt TEXT, password TEXT, created DATETIME default (datetime('now')), updated DATETIME default NULL);",
-      'create table group'      => "CREATE TABLE IF NOT EXISTS Groups (id INTEGER PRIMARY KEY, acronym TEXT KEY, name TEXT, created DATETIME default (datetime('now')), updated DATETIME default NULL);",
+      'create table user'  => "CREATE TABLE IF NOT EXISTS User (id INTEGER PRIMARY KEY, acronym TEXT KEY, name TEXT, email TEXT, algorithm TEXT, salt TEXT, password TEXT, created DATETIME default (datetime('now')), updated DATETIME default NULL, deleted DATETIME default NULL);",
+      'create table group'      => "CREATE TABLE IF NOT EXISTS Groups (id INTEGER PRIMARY KEY, acronym TEXT KEY, name TEXT, created DATETIME default (datetime('now')), updated DATETIME default NULL, deleted DATETIME default NULL);",
       'create table user2group' => "CREATE TABLE IF NOT EXISTS User2Groups (idUser INTEGER, idGroups INTEGER, created DATETIME default (datetime('now')), PRIMARY KEY(idUser, idGroups));", 
       'insert into user'   => 'INSERT INTO User (acronym,name,email,algorithm,salt,password) VALUES (?,?,?,?,?,?);',
       'insert into group'       => 'INSERT INTO Groups (acronym,name) VALUES (?,?);',
       'insert into user2group'  => 'INSERT INTO User2Groups (idUser,idGroups) VALUES (?,?);',
       'check user password' => 'SELECT * FROM User WHERE (acronym=? OR email=?);',
-      'get group memberships'   => 'SELECT * FROM Groups AS g INNER JOIN User2Groups AS ug ON g.id=ug.idGroups WHERE ug.idUser=?;',
+      'get group memberships'   => 'SELECT * FROM Groups AS g INNER JOIN User2Groups AS ug ON g.id=ug.idGroups WHERE ug.idUser=? AND g.deleted IS NULL;',
       'update profile'          => "UPDATE User SET name=?, email=?, updated=datetime('now') WHERE id=?;",
       'update password'         => "UPDATE User SET algorithm=?, salt=?, password=?, updated=datetime('now') WHERE id=?;",
+      'select * by id'          => 'SELECT * FROM User WHERE User.id=? AND deleted IS NULL;',
+      'select * by group'         => 'SELECT u.* FROM User as u INNER JOIN User2Groups AS ug ON u.id=ug.idUser WHERE ug.idGroups=? AND deleted IS NULL;',
+      'select *'                => 'SELECT * FROM User WHERE deleted IS NULL',  
+      'update user as deleted' => "UPDATE User SET deleted=datetime('now') WHERE id=?;",
+      'select all groups'       => 'SELECT * FROM Groups WHERE deleted IS NULL;',
+      'select group by id'      => 'SELECT * FROM Groups WHERE Groups.id=? AND deleted IS NULL;', 
+      'update group as deleted' => "UPDATE Groups SET deleted=datetime('now') WHERE id=?;",
+      'remove from user2group'  => 'DELETE FROM User2Groups WHERE (idUser=? AND idGroups=?);',
       );
     if(!isset($queries[$key])) {
       throw new Exception("No such SQL query, key '$key' was not found.");
@@ -86,6 +94,8 @@ class CMUser extends CObject implements IHasSQL, ArrayAccess, IModule {
       $idAdminGroup = $this->db->LastInsertId();
       $this->db->ExecuteQuery(self::SQL('insert into group'), array('user', 'The User Group'));
       $idUserGroup = $this->db->LastInsertId();
+      $this->db->ExecuteQuery(self::SQL('insert into group'), array('public', 'The Public Group'));
+      $idPublicGroup = $this->db->LastInsertId();
       $this->db->ExecuteQuery(self::SQL('insert into user2group'), array($idRootUser, $idAdminGroup));
       $this->db->ExecuteQuery(self::SQL('insert into user2group'), array($idRootUser, $idUserGroup));
       $this->db->ExecuteQuery(self::SQL('insert into user2group'), array($idDoeUser, $idUserGroup));
@@ -159,6 +169,21 @@ class CMUser extends CObject implements IHasSQL, ArrayAccess, IModule {
     return $this->db->RowCount() === 1;
   }
   
+  /**
+   * Save user profile other than one's own to database.
+   *
+   * @returns boolean true if success else false.
+   */
+  public function SaveOther($user, $add, $remove) {
+    $this->db->ExecuteQuery(self::SQL('update profile'), array($user['name'], $user['email'], $user['id']));
+    foreach ($add as $id) {
+    	    $this->db->ExecuteQuery(self::SQL('insert into user2group'), array($user['id'], $id));
+    }
+    foreach ($remove as $id) {
+    	    $this->db->ExecuteQuery(self::SQL('remove from user2group'), array($user['id'], $id));
+    } 
+    return $this->db->RowCount() === 1;
+  }
   
   /**
    * Change user password.
@@ -171,6 +196,51 @@ class CMUser extends CObject implements IHasSQL, ArrayAccess, IModule {
     $this->db->ExecuteQuery(self::SQL('update password'), array($password['algorithm'], $password['salt'], $password['password'], $this['id']));
     return $this->db->RowCount() === 1;
     }
+    
+  /**
+   * Delete user. Set its deletion-date to enable wastebasket functionality.
+   *
+   * @returns boolean true if success else false.
+   */
+  public function Delete($user) {
+    $this->db->ExecuteQuery(self::SQL('update user as deleted'), array($user['id']));
+    $rowcount = $this->db->RowCount();
+    if($rowcount) {
+      $this->AddMessage('success', "Successfully set user '" . htmlEnt($user['acronym']) . "' as deleted.");
+    } else {
+      $this->AddMessage('error', "Failed to set user '" . htmlEnt($user['acronym']) . "' as deleted.");
+     }
+    return $rowcount === 1;
+  }
+  
+  /**
+  * Create group
+  * @returns boolean true if success.
+  */
+  public function CreateGroup($acronym, $name) {
+    $this->db->ExecuteQuery(self::SQL('insert into group'), array($acronym, $name));
+    if($this->db->RowCount() == 0) {
+      $this->AddMessage('error', "Failed to create group.");
+      return false;
+    }
+    return true;
+  }
+  
+   /**
+   * Delete group. Set its deletion-date to enable wastebasket functionality.
+   *
+   * @returns boolean true if success else false.
+   */
+  public function DeleteGroup($group) {
+    $this->db->ExecuteQuery(self::SQL('update group as deleted'), array($group['id']));
+    $rowcount = $this->db->RowCount();
+    if($rowcount) {
+      $this->AddMessage('success', "Successfully set group '" . htmlEnt($group['acronym']) . "' as deleted.");
+    } else {
+      $this->AddMessage('error', "Failed to set user '" . htmlEnt($group['acronym']) . "' as deleted.");
+     }
+    return $rowcount === 1;
+  }
   
   /**
    * Check if password matches.
@@ -234,6 +304,75 @@ class CMUser extends CObject implements IHasSQL, ArrayAccess, IModule {
     }
     return true;
   }
+  
+   /**
+   * List all groups.
+   *
+   * @returns array with listing or null if empty.
+   */
+  
+  public function ListGroups($args=null) {
+      try {
+  	  return $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('select all groups', $args));
+      } catch(Exception $e) {
+      echo $e;
+      return null;
+    }
+  } 
+  
+  /**
+   * Load group by id.
+   *
+   * @param id integer the id of the content.
+   * @returns listing or null if empty
+   */
+  public function LoadGroupByID($id) {
+    $res = $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('select group by id'), array($id));
+    if(empty($res)) {
+      $this->AddMessage('error', "Failed to load group with id '$id'.");
+      return null;
+    } else {
+      return $res[0];	      
+    }
+  }
+  
+    /**
+   * List all users.
+   *
+   * @returns array with listing or null if empty.
+   */
+  public function ListAll($args=null) {
+    try {
+      if(isset($args) && isset($args['group'])) {
+        return $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('select * by group', $args), array($args['group']));	    
+    } else {	    
+        return $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('select *', $args));
+      }
+    } catch(Exception $e) {
+      echo $e;
+      return null;
+    }
+  }
+  
+   /**
+   * Load user by id.
+   *
+   * @param id integer the id of the content.
+   * @returns listing or null if empty
+   */
+  public function LoadById($id) {
+    $res = $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('select * by id'), array($id));
+    if(empty($res)) {
+      $this->AddMessage('error', "Failed to load user with id '$id'.");
+      return null;
+    } else {
+      $user = $res[0];
+      $user['groups'] = $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('get group memberships'), array($user['id']));
+      return $user;	      
+    }
+  }
+  
+ 
   
 }
  

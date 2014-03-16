@@ -94,9 +94,9 @@ $mm->config['menus'] = array(
     'blog'      => array('label'=>'Blog', 'url'=>'blog'),
   ),
   'nav navbar-nav' => array(
-    'home'      => array('label'=>'About Me', 'url'=>'my'),
-    'blog'      => array('label'=>'My Blog', 'url'=>'my/blog'),
-    'guestbook' => array('label'=>'Guestbook', 'url'=>'my/guestbook'),
+    0      => array('label'=>'About Me', 'url'=>'my'),
+    1      => array('label'=>'My Blog', 'url'=>'my/blog'),
+    2 => array('label'=>'Guestbook', 'url'=>'my/guestbook'),
   ),
 );
 
@@ -121,10 +121,10 @@ $mm->config['theme'] = array(
   'data' => array(
     'header' => 'Mmvc',
     'slogan' => 'A PHP-based MVC-inspired CMF',
- /*   'favicon' => 'logo_80x80.png',
-    'logo' => 'logo_80x80.png',  
-    'logo_width'  => 80,
-    'logo_height' => 80,  */
+ /*   'favicon' => 'logo_80x80.png', */
+    'logo' => '',  /* logo_80x80.png */
+    'logo_width'  => 0 /* 80 */,
+    'logo_height' => 0 /* 80 */,  
     'footer' => '<p>Mmvc &copy; by Mike Frangos </p>',
   ),
 );

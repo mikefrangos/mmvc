@@ -1,2 +1,74 @@
 @import url(css/bootstrap.css);
 
+body {
+	font-family: Georgia, 'Times New Roman', Times, serif;   
+}
+
+h1, h2, h3 {
+	margin-top: 22px;
+	margin-bottom: 22px;
+}
+
+blockquote, dl {
+	margin-bottom: 11px;
+}
+
+#login-menu {
+  float: right;
+  font-size: smaller;
+}
+
+#login-menu img.gravatar {
+  vertical-align: middle;
+}
+
+#login-menu a {
+  text-decoration: none;
+}
+
+#login-menu a:hover {
+  text-decoration: underline;
+}
+
+#banner {
+  display: table;
+  margin-bottom: 0px;
+}
+
+#banner #site-logo {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+
+#banner #site-title {
+  display: table-cell;
+  vertical-align: baseline;
+  text-align: center;
+  font-size: 2.5em;
+/*  padding-left: 0.2em;
+  text-shadow: #ccc 2px -2px 2px;  */
+}
+
+#banner #site-title a {
+  text-decoration: none;
+}
+
+#banner #site-slogan {
+  display: table-cell;
+  vertical-align: baseline;
+  text-align: center;
+  font-size: 1.5em;
+  padding-left: 10px;
+}
+
+.page-header {
+	border-bottom: 0;
+}
+
+#flash, #featured-first, #featured-middle, #featured-last, #column-first,
+#column-middle, #column-last, #footer-column-one, #footer-column-two, 
+#footer-column-three, #footer-column-four, #sidebar, #primary {
+	margin-bottom: 22px;
+}
+

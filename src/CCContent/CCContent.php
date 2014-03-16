@@ -32,7 +32,7 @@ class CCContent extends CObject implements IController {
    */
   public function Edit($id=null) {
     $content = new CMContent($id);
-    $form = new CFormContent($content);
+    $form = new CFormContent($content, $this->user->ListGroups());
     $status = $form->Check();
     if($status === false) {
       $this->AddMessage('notice', 'The form could not be processed.');

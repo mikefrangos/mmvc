@@ -2,7 +2,7 @@
 /**
 * A user controller  to manage login and view edit the user profile.
 * 
-* @package LydiaCore
+* @package MmvcCore
 */
 class CCUser extends CObject implements IController {
 
@@ -146,8 +146,11 @@ class CCUser extends CObject implements IController {
                            $form['email']['value']
                            )) {
       $this->AddMessage('success', "Welcome {$this->user['name']}. Your have successfully created a new account.");
-      $this->user->Login($form['acronym']['value'], $form['password']['value']);
-      $this->RedirectToController('profile');
+      if(!$this->user['isAuthenticated']) {
+        $this->user->Login($form['acronym']['value'], $form['password']['value']);
+        $this->RedirectToController('profile');
+      }
+      else { $this->RedirectTo('acp', 'index'); }
     } else {
       $this->AddMessage('notice', "Failed to create an account.");
       $this->RedirectToController('create');

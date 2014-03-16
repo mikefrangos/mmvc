@@ -22,6 +22,7 @@ class CMGuestbook extends CObject implements IHasSQL, IModule {
    */
   public static function SQL($key=null) {
     $queries = array(
+      'drop table guestbook'    => 'DROP TABLE IF EXISTS Guestbook;',
       'create table guestbook'  => "CREATE TABLE IF NOT EXISTS Guestbook (id INTEGER PRIMARY KEY, entry TEXT, created DATETIME default (datetime('now')));",
       'insert into guestbook'   => 'INSERT INTO Guestbook (entry) VALUES (?);',
       'select * from guestbook' => 'SELECT * FROM Guestbook ORDER BY id DESC;',
@@ -41,6 +42,7 @@ class CMGuestbook extends CObject implements IHasSQL, IModule {
     switch($action) {
       case 'install': 
     try {
+      $this->db->ExecuteQuery(self::SQL('drop table guestbook'));
       $this->db->ExecuteQuery(self::SQL('create table guestbook'));
      return array('success', 'Successfully created the database tables (or left them untouched if they already existed).');
     } catch(Exception$e) {

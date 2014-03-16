@@ -11,7 +11,7 @@ class CCTheme extends CObject implements IController {
    * Constructor
    */
   public function __construct() { parent::__construct(); 
-    $this->views->AddStyle('body:hover{background:#fff url('.$this->request->base_url.'themes/grid/grid_12_60_20.png) repeat-y center top;}'); 
+  /*  $this->views->AddStyle('body:hover{background:#fff url('.$this->request->base_url.'themes/grid/grid_12_60_20.png) repeat-y center top;}'); */
   }
 
 

@@ -28,6 +28,13 @@ class CMmvc implements ISingleton {
     $mm = &$this;
     require(MMVC_SITE_PATH.'/config.php');
     
+    if (is_file(MMVC_SITE_PATH.'/data/header.php')) {
+        require (MMVC_SITE_PATH.'/data/header.php');
+    }
+    if (is_file(MMVC_SITE_PATH.'/data/menu.php')) {
+        require (MMVC_SITE_PATH.'/data/menu.php');
+    }
+    
     // Start a named session
       session_name($this->config['session_name']);
       session_start();
