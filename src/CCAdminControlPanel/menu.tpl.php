@@ -1,9 +1,15 @@
-<h1>Menu Config</h1>
-<p>Here you should be able to view and edit the site's config.</p>
-
-<?php if($is_authenticated): ?>
-<?=$menu_form?>
+<?php if($is_admin): ?>
+<?php if($menus):?>
+<h1>Menu list</h1>
+<ul>
+<?php foreach($menus as $menu):?>
+<li><?=$menu['label']?> <a href='<?=create_url("acp/menu/edit/" . array_search($menu, $menus))?>'>edit</a></li>
+<?php endforeach;?>
+</ul>
+<a href='<?=create_url("acp/menu/create")?>'>Create Menu</a>
+<?php endif;?>
+<?=$form?>
 <?php else: ?>
   
-  <p>User is anonymous and not authenticated.</p>
+  <p>You do not have permission to view this page.</p>
 <?php endif; ?>

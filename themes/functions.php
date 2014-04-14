@@ -57,6 +57,23 @@ function get_messages_from_session() {
 }
 
 /**
+ * Check if there is a message
+ */
+function is_success() {
+    $messages = CMmvc::Instance()->session->GetMessages();
+    if(!empty($messages)) {
+      foreach($messages as $val) {
+    	 if ($val['type'] == 'success') {
+    	    return TRUE;
+    	 }
+      }
+    }
+    return FALSE;
+}
+ 
+    
+	
+/**
 * Login menu. Creates a menu which reflects if user is logged in or not.
 */
 function login_menu() {

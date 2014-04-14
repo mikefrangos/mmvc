@@ -23,9 +23,10 @@ class CMGuestbook extends CObject implements IHasSQL, IModule {
   public static function SQL($key=null) {
     $queries = array(
       'drop table guestbook'    => 'DROP TABLE IF EXISTS Guestbook;',
-      'create table guestbook'  => "CREATE TABLE IF NOT EXISTS Guestbook (id INTEGER PRIMARY KEY, entry TEXT, created DATETIME default (datetime('now')));",
-      'insert into guestbook'   => 'INSERT INTO Guestbook (entry) VALUES (?);',
+      'create table guestbook'  => "CREATE TABLE IF NOT EXISTS Guestbook (id INTEGER PRIMARY KEY, entry TEXT, parent INTEGER default NULL, created DATETIME default (datetime('now')));",
+      'insert into guestbook'   => 'INSERT INTO Guestbook (entry, parent) VALUES (?,?);',
       'select * from guestbook' => 'SELECT * FROM Guestbook ORDER BY id DESC;',
+      'select * by id'          => "SELECT * FROM Guestbook WHERE id=?",
       'delete from guestbook'   => 'DELETE FROM Guestbook;',
      );
     if(!isset($queries[$key])) {
@@ -60,12 +61,15 @@ class CMGuestbook extends CObject implements IHasSQL, IModule {
   /**
    * Add a new entry to the guestbook and save to database.
    */
-  public function Add($entry) {
-    $this->db->ExecuteQuery(self::SQL('insert into guestbook'), array($entry));
-    $this->session->AddMessage('success', 'Successfully inserted new message.');
-    if($this->db->rowCount() != 1) {
-      die('Failed to insert new guestbook item into database.');
+  public function Add($entry, $parent) {
+    $this->db->ExecuteQuery(self::SQL('insert into guestbook'), array($entry, $parent));
+    $rowcount = $this->db->RowCount();
+    if($rowcount) {
+        $this->session->AddMessage('success', 'Successfully inserted new message.');
+    } else {
+        $this->AddMessage('error', 'Failed to insert new guestbook item into database.');
     }
+    return $rowcount === 1;
   }
   
 
@@ -75,6 +79,7 @@ class CMGuestbook extends CObject implements IHasSQL, IModule {
   public function DeleteAll() {
     $this->db->ExecuteQuery(self::SQL('delete from guestbook'));
     $this->session->AddMessage('info', 'Removed all messages from the database table.');
+    return true;
   }
   
   
@@ -88,6 +93,25 @@ class CMGuestbook extends CObject implements IHasSQL, IModule {
       return array();    
     }
   }
+  
+  public function Read($id=null) {
+    if (isset($id)) {
+      try {
+    	return $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('select * by id'), (array($id)));
+      } catch(Exception $e) {
+      	return false;
+      } 
+    } else {
+      try {
+        return $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('select * from guestbook'));
+      } catch(Exception $e) {
+        return array();    
+      }
+   }
+    	  
+  }
+    
+   
 
   
 }

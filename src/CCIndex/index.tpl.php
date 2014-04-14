@@ -12,7 +12,7 @@
 <p>First you have to make the data-directory writable. This is the place where Mmvc needs
 to be able to write and create files.</p>
 <blockquote>
-<code>cd lydia; chmod 777 site/data</code>
+<code>cd mmvc; chmod 777 site/data</code>
 </blockquote>
 
 <p>Second, Mmvc has some modules that need to be initialised. You can do this through a 

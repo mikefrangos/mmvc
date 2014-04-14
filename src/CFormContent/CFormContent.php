@@ -45,13 +45,13 @@ class CFormContent extends CForm {
     $content['filter'] = $form['filter']['value'];
     $add = array();
     $remove = array();
-    if (!empty($form['groups']['checked'])) {
-    	$content['public'] = 1;
-        $keys = array();
-        $members = array_column($content['groups'], 'name'); 
-        foreach ($groups as $group) {
+    $keys = array();
+    $members = isset($content['groups']) ? array_column($content['groups'], 'name') : array(); 
+    foreach ($groups as $group) {
     	    $keys[$group['name']] = $group['id'];
-        }
+    }
+    if (!empty($form['groups']['checked'])) { 
+    	$content['public'] = 1;
         foreach ($members as $member) {
     	    	 if (!in_array($member, $form['groups']['checked'])) {
     	    		    array_push($remove, $keys[$member]);
@@ -62,6 +62,9 @@ class CFormContent extends CForm {
     	    	    array_push($add, $keys[$checked]);
     	    }
         }
+    } else {
+       $remove = isset($content['groups']) ? array_column($content['groups'], 'id') : array(); 
+       $content['public'] = null;
     }
     return $content->Save($add, $remove);
   }

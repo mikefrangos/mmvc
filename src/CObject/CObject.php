@@ -14,6 +14,7 @@ class CObject {
    protected $views;
    protected $session;
    protected $user;
+   protected $site;
 
    /**
     * Constructor
@@ -30,6 +31,7 @@ class CObject {
     $this->views    = &$mm->views;
     $this->session  = &$mm->session;
     $this->user     = &$mm->user;
+    $this->site     = &$mm->site;
 
   }
 

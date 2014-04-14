@@ -106,9 +106,9 @@ $mm->config['menus'] = array(
 $mm->config['theme'] = array(
   // The name of the theme in the theme directory
 //  'path'            => 'site/themes/mytheme',
- // 'path' => 'themes/grid',
-  'path' => 'themes/dist',
-  'parent'          => 'themes/dist',
+//  'path' => 'themes/grid',
+    'path' => 'themes/bootstrap',
+    'parent'          => 'themes/bootstrap',
  // 'name'    => 'grid', 
   'stylesheet'  => 'style.css', 
   'template_file'   => 'index.tpl.php',

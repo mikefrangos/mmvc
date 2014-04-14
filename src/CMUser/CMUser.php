@@ -58,6 +58,7 @@ class CMUser extends CObject implements IHasSQL, ArrayAccess, IModule {
       'update user as deleted' => "UPDATE User SET deleted=datetime('now') WHERE id=?;",
       'select all groups'       => 'SELECT * FROM Groups WHERE deleted IS NULL;',
       'select group by id'      => 'SELECT * FROM Groups WHERE Groups.id=? AND deleted IS NULL;', 
+      'update group'          => "UPDATE Groups SET acronym=?, name=?, updated=datetime('now') WHERE id=?;", 
       'update group as deleted' => "UPDATE Groups SET deleted=datetime('now') WHERE id=?;",
       'remove from user2group'  => 'DELETE FROM User2Groups WHERE (idUser=? AND idGroups=?);',
       );
@@ -94,8 +95,6 @@ class CMUser extends CObject implements IHasSQL, ArrayAccess, IModule {
       $idAdminGroup = $this->db->LastInsertId();
       $this->db->ExecuteQuery(self::SQL('insert into group'), array('user', 'The User Group'));
       $idUserGroup = $this->db->LastInsertId();
-      $this->db->ExecuteQuery(self::SQL('insert into group'), array('public', 'The Public Group'));
-      $idPublicGroup = $this->db->LastInsertId();
       $this->db->ExecuteQuery(self::SQL('insert into user2group'), array($idRootUser, $idAdminGroup));
       $this->db->ExecuteQuery(self::SQL('insert into user2group'), array($idRootUser, $idUserGroup));
       $this->db->ExecuteQuery(self::SQL('insert into user2group'), array($idDoeUser, $idUserGroup));
@@ -182,7 +181,23 @@ class CMUser extends CObject implements IHasSQL, ArrayAccess, IModule {
     foreach ($remove as $id) {
     	    $this->db->ExecuteQuery(self::SQL('remove from user2group'), array($user['id'], $id));
     } 
-    return $this->db->RowCount() === 1;
+   if ($this->db->RowCount() !== 1) {
+      return false;
+   }
+   if ($user['id'] == $this['id']) {
+       $user['groups'] = $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('get group memberships'), array($user['id']));
+       foreach($user['groups'] as $val) {
+        if($val['id'] == 1) {
+          $user['hasRoleAdmin'] = true;
+        }
+        if($val['id'] == 2) {
+          $user['hasRoleUser'] = true;
+        }
+      }
+      $this->profile = $user;
+      $this->session->SetAuthenticatedUser($this->profile);
+    }
+    return true;
   }
   
   /**
@@ -214,13 +229,17 @@ class CMUser extends CObject implements IHasSQL, ArrayAccess, IModule {
   }
   
   /**
-  * Create group
+  * Create or save group
   * @returns boolean true if success.
   */
-  public function CreateGroup($acronym, $name) {
-    $this->db->ExecuteQuery(self::SQL('insert into group'), array($acronym, $name));
+  public function SaveGroup($group) {
+    if($group['id']) {
+      $this->db->ExecuteQuery(self::SQL('update group'), array($group['acronym'], $group['name'], $group['id']));
+    } else {
+      $this->db->ExecuteQuery(self::SQL('insert into group'), array($group['acronym'], $group['name']));
+    }
     if($this->db->RowCount() == 0) {
-      $this->AddMessage('error', "Failed to create group.");
+      $this->AddMessage('error', "Failed to save group.");
       return false;
     }
     return true;
@@ -344,16 +363,24 @@ class CMUser extends CObject implements IHasSQL, ArrayAccess, IModule {
   public function ListAll($args=null) {
     try {
       if(isset($args) && isset($args['group'])) {
-        return $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('select * by group', $args), array($args['group']));	    
+        $users = $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('select * by group', $args), array($args['group']));	    
     } else {	    
-        return $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('select *', $args));
-      }
+    	$users = $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('select *', $args));
+    }
+     if ($users) {
+    	$i=0;
+    	do {   
+    	  $users[$i]['groups'] = $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('get group memberships'), array($users[$i]['id']));
+   	  $i++;
+    	} while (isset($users[$i]['id']));
+    }
+    	return $users;
     } catch(Exception $e) {
       echo $e;
       return null;
     }
   }
-  
+
    /**
    * Load user by id.
    *

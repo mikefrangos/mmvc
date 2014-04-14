@@ -7,13 +7,14 @@
 class CMmvc implements ISingleton {
 
   private static $instance = null;
-  public $config = array();
+  public $config = Array();
   public $request;
   public $data;
   public $db;
   public $views;
   public $session;
   public $user;
+  public $site;
   public $timer = array();
   
   
@@ -26,14 +27,11 @@ class CMmvc implements ISingleton {
   	  
     // include the site specific config.php and create a ref to $ly to be used by config.php
     $mm = &$this;
+    
     require(MMVC_SITE_PATH.'/config.php');
     
-    if (is_file(MMVC_SITE_PATH.'/data/header.php')) {
-        require (MMVC_SITE_PATH.'/data/header.php');
-    }
-    if (is_file(MMVC_SITE_PATH.'/data/menu.php')) {
-        require (MMVC_SITE_PATH.'/data/menu.php');
-    }
+    $this->site = new CMConfig($this); 
+    
     
     // Start a named session
       session_name($this->config['session_name']);
@@ -41,6 +39,14 @@ class CMmvc implements ISingleton {
       $this->session = new CSession($this->config['session_key']);
       $this->session->PopulateFromSession();            
                 
+      $entry = $this->session->GetFlash('entry');
+    
+      if ($entry) {
+    	    $config = substr($entry, 6);
+            eval($config);
+            $this->session->SetFlash('entry', $entry);
+      }
+      
     // Set default date/time-zone
       date_default_timezone_set('UTC');
     
@@ -54,6 +60,7 @@ class CMmvc implements ISingleton {
        
      // Create a object for the user
     $this->user = new CMUser($this);
+     
   }
   
   
@@ -119,6 +126,7 @@ class CMmvc implements ISingleton {
    * Theme Engine Render, renders the views using the selected theme.
    */
   public function ThemeEngineRender() {
+  	  
     $this->session->StoreInSession();
     
     if(!isset($this->config['theme'])) {

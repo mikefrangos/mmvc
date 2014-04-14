@@ -37,9 +37,11 @@ class CCMycontroller extends CObject implements IController {
   /**
    * The guestbook.
    */
-  public function Guestbook() {
+  public function Guestbook($id=null) {
     $guestbook = new CMGuestbook();
-    $form = new CFormMyGuestbook($guestbook);
+    $form = new CFormMyGuestbook($guestbook, $id);
+    $threaded = new CThreadedComments($guestbook->Read($id));
+    $threaded->print_comments();
     $status = $form->Check();
     if($status === false) {
       $this->AddMessage('notice', 'The form could not be processed.');
@@ -50,7 +52,8 @@ class CCMycontroller extends CObject implements IController {
     
     $this->views->SetTitle('My Guestbook')
          ->AddInclude(__DIR__ . '/guestbook.tpl.php', array(
-            'entries'=>$guestbook->ReadAll(), 
+            'entries'=>$threaded->sorted, 
+            'unsorted'=>$guestbook->Read($id),
             'form'=>$form,
          ));
   }
@@ -72,10 +75,11 @@ class CFormMyGuestbook extends CForm {
   /**
    * Constructor
    */
-  public function __construct($object) {
+  public function __construct($object, $id) {
     parent::__construct();
     $this->object = $object;
-    $this->AddElement(new CFormElementTextarea('data', array('label'=>'Add entry:')))
+    $this->AddElement(new CFormElementHidden('id', array('value'=>$id)))
+         ->AddElement(new CFormElementTextarea('data', array('label'=>'Add entry:')))
          ->AddElement(new CFormElementSubmit('add', array('callback'=>array($this, 'DoAdd'), 'callback-args'=>array($object))));
   }
   
@@ -84,7 +88,7 @@ class CFormMyGuestbook extends CForm {
    * Callback to add the form content to database.
    */
   public function DoAdd($form, $object) {
-    return $object->Add(strip_tags($form['data']['value']));
+    return $object->Add(strip_tags($form['data']['value']), $form['id']['value']);
   }
 
 
