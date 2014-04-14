@@ -57,9 +57,9 @@ class CTextFilter {
  * @return string as the formatted html-text.
  */
 public static function markdown($text) {
-  require_once(__DIR__ . '/php-markdown/Markdown/MarkdownInterface.php');
-  require_once(__DIR__ . '/php-markdown/Markdown/Markdown.php'); 
-  require_once(__DIR__ . '/php-markdown/Markdown/MarkdownExtra.php');
+  require_once(__DIR__ . '/markdown/Markdown/MarkdownInterface.php');
+  require_once(__DIR__ . '/markdown/Markdown/Markdown.php'); 
+  require_once(__DIR__ . '/markdown/Markdown/MarkdownExtra.php');
 /*  $ret = Markdown($text);
   return $ret; */
   return Markdown::defaultTransform($text);
