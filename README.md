@@ -4,9 +4,17 @@ This project is submitted for examination for BTH's phpmvc course.
 
 installation
 -----------
-First, clone this framework. If you are installing on to www.student.bth.se, you will need to open the .htaccess file, uncomment the rewritebase rule and add your base URL. 
+First, clone this framework from github into your directory:
 
-Then, point your browser to the directory where you installed Mmvc and follow the remainder of the instructions.
+> git clone git://github.com/mikefrangos/mmvc.git
+
+First you have to make the data-directory writable. This is the place where Mmvc needs to be able to write and create files.
+
+> cd mmvc; chmod 777 site/data
+
+If you are installing on to www.student.bth.se, you will need to open the .htaccess file, uncomment the rewritebase rule and add your base URL. 
+
+Finally, there are some modules that need to be initialized. Access the "install" method within the module controller. You can find this from the index page of your installation, or by adding "module/install" after your base url. 
 
 a customizable framework
 -----------
