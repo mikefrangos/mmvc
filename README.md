@@ -8,7 +8,7 @@ First, clone this framework from github into your directory:
 
 > git clone git://github.com/mikefrangos/mmvc.git
 
-First you have to make the data-directory writable. This is the place where Mmvc needs to be able to write and create files.
+Then, you have to make the data-directory writable. This is the place where Mmvc needs to be able to write and create files.
 
 > cd mmvc; chmod 777 site/data
 
