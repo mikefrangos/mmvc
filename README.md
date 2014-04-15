@@ -10,9 +10,11 @@ Then, point your browser to the directory where you installed Mmvc and follow th
 
 a customizable framework
 -----------
-To create a blog post, access the "create" method within the content controller. Then specify the content type as "post." To create a static page, speicfy the content type as "page." To view all blog posts, click "my blog" from the menu bar. To view all content, access the content controller. 
+The default theme is based on Twitter's Bootstrap with responsivity enabled. Try resizing the window to see this in action.
 
-Logo, header, footer and menu may be edited from config.php. To customize the framework via web interface, login as root (username: root, password: root), and access the "config" method within the acp controller. Menus can be modified from the "menu" method within acp.
+To create a blog post, access the "create" method within the content controller. Then specify the content type as "post." To create a static page, speicfy the content type as "page." To view all blog posts, click "my blog" from the menu bar. To view all content, access the content controller. Any content can have the following filters applied: "htmlpurify", "bbcode", "markdown", or "smartypants". 
+
+Logo, header, footer and menu may be edited from config.php. To customize the framework via web interface, login as root (username: root, password: root), and access the "config" method within the acp controller. Here, you can also change the logo, header, and footer. Menus can be similarly created, edited or deleted from the "menu" method within acp.
 
 the administrative interface
 ----------
@@ -23,6 +25,10 @@ Users and groups may be created from the acp controller and may be edited from h
 In order to limit content to members of a certain group, edit that content and choose which groups may be allowed to see it. Any content that does not belong to a group is considered public.
 
 NOTE: the "root" user is not a true superuser but only has admin privileges based on belonging to the admin group. If you remove "root" from the admin group, you will lose access to acp and any content that is limited to members of the admin group.
+
+threaded comments
+----------
+Threaded comments are handled through an external module, CThreadedComments. Adding and replying to comments on the guestbook will demonstrate this implementation.
 
 test installation
 ---------
