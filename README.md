@@ -20,7 +20,7 @@ a customizable framework
 -----------
 The default theme is based on Twitter's Bootstrap with responsivity enabled. Try resizing the window to see this in action.
 
-To create a blog post, access the "create" method within the content controller. Then specify the content type as "post." To create a static page, speicfy the content type as "page." To view all blog posts, click "my blog" from the menu bar. To view all content, access the content controller. Any content can have the following filters applied: "htmlpurify", "bbcode", "markdown", or "smartypants". 
+To create a blog post, access the "create" method within the content controller. Then specify the content type as "post." To create a static page, specify the content type as "page." To view all blog posts, click "my blog" from the menu bar. To view all content, access the content controller. Any content can have the following filters applied: "htmlpurify", "bbcode", "markdown", or "smartypants". 
 
 Logo, header, footer and menu may be edited from config.php. To customize the framework via web interface, login as root (username: root, password: root), and access the "config" method within the acp controller. Here, you can also change the logo, header, and footer. Menus can be similarly created, edited or deleted from the "menu" method within acp.
 
