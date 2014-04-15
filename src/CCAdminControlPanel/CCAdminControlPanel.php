@@ -48,73 +48,6 @@ class CCAdminControlPanel extends CObject implements IController {
     ));
   }
   
-   /**
-  * View and edit config options.
- 
-  public function MenuCreate() {
-      $form = new CFormMenuCreate($this);
-      if($form->Check() === false) {
-        $this->AddMessage('notice', 'Some fields did not validate and the form could not be processed.');
-        $this->RedirectToController('menucreate');
-      }
-      $this->views->SetTitle('Menu Create');
-      $this->views->AddInclude(__DIR__ . '/menu.tpl.php', array(
-        'is_authenticated'=>$this->user['isAuthenticated'],  
-        'menu_form'=>$form->GetHTML(),
-    ));
-  }
- /* 
-  public function Menu($arg=null, $id=null) {
-    $form = new CFormMenu($this->site, $this->config['menus']['nav navbar-nav']);
-    $status = $form->Check();
-    if($status === false) {
-        $this->AddMessage('notice', 'You must fill in all values.');
-        $this->RedirectToController('group');
-    } elseif($status === true) {
-        $this->RedirectToController('group');
-    }  
-    if ($arg == 'create') {
-            $menu = null;
-            $create = $form->GetHTML();
-            $this->views->SetTitle('Create group'); 
-         }
-    elseif ($id) {
-    	 $menu = $this->config['menus']['nav navbar-nav'];
-         if ($arg == 'delete') {
-  	   $this->site->DeleteMenu($id);
-  	   $this->RedirectToController('index');
-         }    
-         elseif ($arg == 'view') {
-         	 $create = "";
-         	 $users = $this->user->ListAll(array('group' => $id));
-         	 $groups[] = $this->user->LoadGroupbyID($id);
-         }        	 
-    } 
-  }
-    /**
-  * View and edit config options.
-  
-  public function Menu($arg=null) {
-      if ($arg == 'create') {
-      	  $menu = null;      
-      } else { 
-      	  $menu = $this->config['menus']['nav navbar-nav'];
-      }  
-      $form = new CFormMenu($this->site, $menu);
-      $status = $form->Check();
-      if($status === false) {
-        $this->AddMessage('notice', 'Some fields did not validate and the form could not be processed.');
-        $this->RedirectToController('menu');
-      } elseif ($status === true) {
-      	      $this->RedirectToController('index');
-      }
-      $this->views->SetTitle('Menu Config');
-      $this->views->AddInclude(__DIR__ . '/menu.tpl.php', array(
-        'is_authenticated'=>$this->user['isAuthenticated'],  
-        'menu_form'=>$form->GetHTML(),
-    ));
-  } */
-  
   public function Group($arg=null, $id=null) {
      $users = "";
      $groups = "";
@@ -178,66 +111,6 @@ class CCAdminControlPanel extends CObject implements IController {
                 ));
   }
     
-  /*  if (!$id) {
-       $create = "";
-       $users = $this->user->ListAll();
-       $groups = $this->user->ListGroups();
-    } else {
-       $form = new CFormGroup($this->user, $this->user->LoadGroupByID($id));
-       $status = $form->Check();
-       if($status === false) {
-        $this->AddMessage('notice', 'You must fill in all values.');
-        $this->RedirectToController('group');
-    } elseif($status === true) {
-        $this->RedirectToController('group');
-    }    
-    
-    if ($id) {
-    	 $group = $this->user->LoadGroupByID($id);
-         if ($arg == 'delete') {
-  	   $this->user->DeleteGroup($group);
-  	   $this->RedirectToController('index');
-         }    
-         elseif ($arg == 'view') {
-         	 $create = "";
-         	 $users = $this->user->ListAll(array('group' => $id));
-         	 $groups[] = $this->user->LoadGroupbyID($id);
-         }  
-        elseif ($arg == 'edit')      	 
-    }
-  	  
-  	  
-    $form = new CFormGroup($this->user, $this->user->LoadGroupByID($id));
-    $status = $form->Check();
-    if($status === false) {
-        $this->AddMessage('notice', 'You must fill in all values.');
-        $this->RedirectToController('group');
-    } elseif($status === true) {
-        $this->RedirectToController('group');
-    }
-    if ($arg == 'create') {
-            $users = null;
-            $groups = null;
-            $create = $form->GetHTML();
-            $this->views->SetTitle('Create group'); 
-         }	  
-    elseif ($id) {
-    	 $group = $this->user->LoadGroupByID($id);
-         if ($arg == 'delete') {
-  	   $this->user->DeleteGroup($group);
-  	   $this->RedirectToController('index');
-         }    
-         elseif ($arg == 'view') {
-         	 $create = "";
-         	 $users = $this->user->ListAll(array('group' => $id));
-         	 $groups[] = $this->user->LoadGroupbyID($id);
-         }        	 
-    } else {
-       $create = "";
-       $users = $this->user->ListAll();
-       $groups = $this->user->ListGroups();
-    }
-  */
     	    
  /**
    * View and edit user profile.
@@ -265,43 +138,6 @@ class CCAdminControlPanel extends CObject implements IController {
       'profile_form'=>$form->GetHTML(),
     ));
   }
-  
-  
-  
-  /**
-  * Create a group.
-  
-  public function CreateGroup() {
-    $form = new CFormGroupCreate($this->user);
-    if($form->Check() === false) {
-      $this->AddMessage('notice', 'You must fill in all values.');
-      $this->RedirectToController('CreateGroup');
-    }
-    $this->views->SetTitle('Create group');
-    $this->views->AddInclude(__DIR__ . '/create.tpl.php', array('form' => $form->GetHTML()));     
-  } */
-  
- 
-
- /*
- public function DoConfigSave($form) {
-    $entry = "<?php \$mm->config['theme']['data']['header']='{$form['header']['value']}';";
-    $entry .= " \$mm->config['theme']['data']['footer']='{$form['footer']['value']}';";
-    $entry .= " \$mm->config['theme']['data']['logo']='{$form['logo']['value']}';";
-    $entry .= " \$mm->config['theme']['data']['logo_height']='{$form['logo_height']['value']}';";
-    $entry .= " \$mm->config['theme']['data']['logo_width']='{$form['logo_width']['value']}';";
-  /*  $this->config['theme']['data']['header'] = $form['header']['value']; 
-    $ret = $this->site->Save($entry);
- /*   if ($ret) {
-    	    $this->AddMessage('success', 'Config saved.');
-    } else {
-    	    $this->AddMessage('error', 'Config could not be saved.');
-    } 
-   return $ret; 
-    
-/*   $this->site->Load(); 
-  $this->RedirectToController('config'); 
- } */
  
 
 } 

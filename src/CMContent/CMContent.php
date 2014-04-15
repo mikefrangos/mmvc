@@ -55,7 +55,7 @@ class CMContent extends CObject implements IHasSQL, ArrayAccess, IModule {
       'drop table content2group' => "DROP TABLE IF EXISTS Content2Groups",
       'create table content'    => "CREATE TABLE IF NOT EXISTS Content (id INTEGER PRIMARY KEY, key TEXT KEY, type TEXT, title TEXT, data TEXT, filter TEXT, idUser INT, public INT default NULL, created DATETIME default (datetime('now')), updated DATETIME default NULL, deleted DATETIME default NULL, FOREIGN KEY(idUser) REFERENCES User(id));",
       'create table content2group' => "CREATE TABLE IF NOT EXISTS Content2Groups (idContent INTEGER, idGroups INTEGER, created DATETIME default (datetime('now')), PRIMARY KEY(idContent, idGroups));", 
-      'insert content'          => 'INSERT INTO Content (key,type,title,data,filter,idUser) VALUES (?,?,?,?,?,?);',
+      'insert content'          => 'INSERT INTO Content (key,type,title,data,filter,public,idUser) VALUES (?,?,?,?,?,?,?);',
       'insert into content2group'  => 'INSERT INTO Content2Groups (idContent,idGroups) VALUES (?,?);',
       'get group memberships'   => 'SELECT * FROM Groups AS g INNER JOIN Content2Groups AS cg ON g.id=cg.idGroups WHERE cg.idContent=? AND g.deleted IS NULL;',
       'select * by id'          => "SELECT c.*, u.acronym as owner FROM Content AS c INNER JOIN User as u ON c.idUser=u.id LEFT JOIN Content2Groups as cg ON c.id=cg.idContent WHERE (c.public IS NULL {$groups}) AND c.id=? AND c.deleted IS NULL;",
@@ -118,7 +118,7 @@ class CMContent extends CObject implements IHasSQL, ArrayAccess, IModule {
       $this->db->ExecuteQuery(self::SQL('update content'), array($this['key'], $this['type'], $this['title'], $this['data'], $this['filter'], $this['public'], $this['id']));
       $msg = 'update';
     } else {
-      $this->db->ExecuteQuery(self::SQL('insert content'), array($this['key'], $this['type'], $this['title'], $this['data'], $this['filter'], $this->user['id']));
+      $this->db->ExecuteQuery(self::SQL('insert content'), array($this['key'], $this['type'], $this['title'], $this['data'], $this['filter'], $this['public'], $this->user['id']));
       $this['id'] = $this->db->LastInsertId();
       $msg = 'created';
     }
