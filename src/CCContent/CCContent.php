@@ -38,7 +38,7 @@ class CCContent extends CObject implements IController {
       $this->AddMessage('notice', 'The form could not be processed.');
       $this->RedirectToController('edit', $id);
     } else if($status === true) {
-      $this->RedirectToController('edit', $content['id']);
+      $this->RedirectTo('page/view', $content['id']);
     }
     
     $title = isset($id) ? 'Edit' : 'Create';

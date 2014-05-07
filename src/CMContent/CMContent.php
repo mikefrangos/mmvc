@@ -181,6 +181,30 @@ class CMContent extends CObject implements IHasSQL, ArrayAccess, IModule {
        return false;
   }
   
+  /**
+   * Check content permissions.
+   *
+   * @param id integer the id of the content.
+   * @returns boolean true if success else false.
+   */
+  public function CheckGroups($id) {
+      $groups = $this->db->ExecuteSelectQueryAndFetchAll(self::SQL('get group memberships'), array($id));	  
+      if (!empty($groups)) {
+      	   if (!empty($this->user['groups'])) { 
+      	   	 if (empty(array_intersect(array_column($this->user['groups'], 'id'), array_column($groups, 'id')))) {
+      	   	    $this->AddMessage('notice', 'You do not have permission to view this content. Check your group memberships.');
+      	            return false;
+      	         }
+           } else {
+              $this->AddMessage('notice', 'You do not have permission to view this content. Check your group memberships.');
+      	      return false;
+           }
+      } else {
+      	   return true;
+      }
+  }
+      	  
+    
   
   /**
    * List all content.
