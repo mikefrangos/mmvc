@@ -35,7 +35,7 @@ class CCPage extends CObject implements IController {
   public function View($id=null) {
     $content = new CMContent($id);
     if (!$content->CheckGroups($id)) {
-    	       $this->RedirectTo('content/edit', $id);
+    	       $this->RedirectTo('content/create');
   }
     $this->views->SetTitle('Page: '.htmlEnt($content['title']));
     $this->views->AddInclude(__DIR__ . '/index.tpl.php', array(
